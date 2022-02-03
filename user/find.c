@@ -4,6 +4,7 @@
 #include "kernel/fs.h"
 
 
+// TODO bug
 void
 find(char *path, char* target_file)
 {
@@ -32,7 +33,7 @@ find(char *path, char* target_file)
     *p++ = '/';
     
 	// read the name of each file/folder under the folder specified by fd, which is $path, name is de.name
-    while(read(fd, &de, sizeof(de) == sizeof(de))){
+    while(read(fd, &de, sizeof(de)) == sizeof(de)){
         if(de.inum == 0)
           continue;
         memmove(p, de.name, DIRSIZ);

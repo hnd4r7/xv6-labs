@@ -1,0 +1,24 @@
+{
+    "files.associations": {
+        "locale": "c",
+        "user.h": "c",
+        "stat.h": "c",
+        "types.h": "c",
+        "__config": "c",
+        "syscall.h": "c",
+        "memlayout.h": "c",
+        "algorithm": "c",
+        "deque": "c",
+        "memory_resource": "c",
+        "functional": "c",
+        "iterator": "c",
+        "string": "c",
+        "proc.h": "c",
+        "chrono": "c",
+        "sysinfo.h": "c",
+        "defs.h": "c",
+        "riscv.h": "c",
+        "param.h": "c",
+        "spinlock.h": "c"
+    }
+}

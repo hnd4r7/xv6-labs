@@ -117,10 +117,10 @@ sys_sysinfo(void)
   if(argaddr(0, &addr) < 0 )
     return -1;
 
-  struct sysinfo *si;
+  struct sysinfo si;
 
-  si->nproc = nproc();
-  si->freemem = freememsize();
+  si.nproc = nproc();
+  si.freemem = freememsize();
   
   struct proc *p = myproc();
   if(copyout(p->pagetable, addr, (char *)&si, sizeof(si)) < 0)

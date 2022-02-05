@@ -51,7 +51,7 @@ kfree(void *pa)
   if(((uint64)pa % PGSIZE) != 0 || (char*)pa < end || (uint64)pa >= PHYSTOP)
     panic("kfree");
 
-  // Fill with junk to catch dangling refs.
+  // Fill with junk to catch dangling refs.  hopefully that will cause  code to break faster.
   memset(pa, 1, PGSIZE);
 
   r = (struct run*)pa;

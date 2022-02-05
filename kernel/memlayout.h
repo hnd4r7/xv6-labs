@@ -57,7 +57,7 @@
 
 // map kernel stacks beneath the trampoline,
 // each surrounded by invalid guard pages.
-#define KSTACK(p) (TRAMPOLINE - (p)*2*PGSIZE - 3*PGSIZE)
+#define KSTACK(p) (TRAMPOLINE - (p)*2*PGSIZE - 3*PGSIZE) // 1 page kernel stack + 1 guard page ？ so max kernel stack size is 4k.
 
 // User memory layout.
 // Address zero first:
@@ -66,7 +66,7 @@
 //   fixed-size stack
 //   expandable heap
 //   ...
-//   USYSCALL (shared with kernel)
+//   USYSCALL (shared with kernel) 这个page内核和user公用 !! 
 //   TRAPFRAME (p->trapframe, used by the trampoline)
 //   TRAMPOLINE (the same page as in the kernel)
 #define TRAPFRAME (TRAMPOLINE - PGSIZE)

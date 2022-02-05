@@ -21,7 +21,7 @@ kvmmake(void)
 {
   pagetable_t kpgtbl;
 
-  kpgtbl = (pagetable_t) kalloc();
+  kpgtbl = (pagetable_t) kalloc(); // allocate top level page directory
   memset(kpgtbl, 0, PGSIZE);
 
   // uart registers
@@ -41,7 +41,7 @@ kvmmake(void)
 
   // map the trampoline for trap entry/exit to
   // the highest virtual address in the kernel.
-  kvmmap(kpgtbl, TRAMPOLINE, (uint64)trampoline, PGSIZE, PTE_R | PTE_X);
+  kvmmap(kpgtbl, TRAMPOLINE, (uint64)trampoline, PGSIZE, PTE_R | PTE_X); //注意： 此时va 和 pa并非直接映射。而是虚拟va映射pa
 
   // map kernel stacks
   proc_mapstacks(kpgtbl);
@@ -78,7 +78,7 @@ kvminithart()
 //   12..20 -- 9 bits of level-0 index.
 //    0..11 -- 12 bits of byte offset within the page.
 pte_t *
-walk(pagetable_t pagetable, uint64 va, int alloc)
+walk(pagetable_t pagetable, uint64 va, int alloc) //finds the PTE for a virtual address
 {
   if(va >= MAXVA)
     panic("walk");
@@ -86,20 +86,20 @@ walk(pagetable_t pagetable, uint64 va, int alloc)
   for(int level = 2; level > 0; level--) {
     pte_t *pte = &pagetable[PX(level, va)];
     if(*pte & PTE_V) {
-      pagetable = (pagetable_t)PTE2PA(*pte);
+      pagetable = (pagetable_t)PTE2PA(*pte); //取出pte的值 = 下一级page table地址 (4k对齐)
     } else {
-      if(!alloc || (pagetable = (pde_t*)kalloc()) == 0)
+      if(!alloc || (pagetable = (pde_t*)kalloc()) == 0) // 未找到pte： 分配新的物理页面存放page table
         return 0;
       memset(pagetable, 0, PGSIZE);
       *pte = PA2PTE(pagetable) | PTE_V;
     }
   }
-  return &pagetable[PX(0, va)];
+  return &pagetable[PX(0, va)]; //  returns the PTE address of level 0 for given VA.
 }
 
 // Look up a virtual address, return the physical address,
 // or 0 if not mapped.
-// Can only be used to look up user pages.
+// Can only be used to look up user pages. //offset 不管。 pa和va都已经 4k对齐。
 uint64
 walkaddr(pagetable_t pagetable, uint64 va)
 {
@@ -275,6 +275,7 @@ freewalk(pagetable_t pagetable)
       freewalk((pagetable_t)child);
       pagetable[i] = 0;
     } else if(pte & PTE_V){
+      printf("panic pte : %p \n", (void*)pte);
       panic("freewalk: leaf");
     }
   }
@@ -432,3 +433,7 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
     return -1;
   }
 }
+
+void vmprint(pagetable_t p){
+
+} 

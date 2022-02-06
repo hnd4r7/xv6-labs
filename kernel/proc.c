@@ -237,6 +237,9 @@ proc_freepagetable(pagetable_t pagetable, uint64 sz)
 {
   uvmunmap(pagetable, TRAMPOLINE, 1, 0);
   uvmunmap(pagetable, TRAPFRAME, 1, 0);
+  #ifdef LAB_PGTBL
+  uvmunmap(pagetable, USYSCALL, 1, 0);
+  #endif
   uvmfree(pagetable, sz);
 }
 

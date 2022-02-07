@@ -81,6 +81,37 @@ int
 sys_pgaccess(void)
 {
   // lab pgtbl: your code here.
+  uint64 upage_addr;
+  int page_nums;
+  uint64 ubitmap_addr;
+
+  argaddr(0, &upage_addr);
+  argint(1, &page_nums);
+  argaddr(2, &ubitmap_addr);
+
+  if (upage_addr >= MAXVA || (upage_addr+PGSIZE >= MAXVA)) {
+    return -1;
+  }
+
+  uint64 bitmap = 0;
+  // uint64 start_addr = PGROUNDDOWN(upage_addr);
+  struct proc *pr = myproc();
+  if (page_nums > 64)
+  {
+    return -1;
+  }
+  
+  for(int i = 0; i < page_nums; i++){
+    uint64 va = upage_addr + i*PGSIZE;
+    pte_t *pte = walk(pr->pagetable, va, 0);
+    if (pte != 0 && (*pte & PTE_V) && (*pte & PTE_U) && (*pte & PTE_A)){
+      bitmap |= 1 << i;
+      *pte = (*pte) & (~PTE_A);
+    }else{
+      bitmap |= 0 << i;
+    }
+  }
+  copyout(pr->pagetable, ubitmap_addr, (char*)&bitmap, sizeof(bitmap));
   return 0;
 }
 #endif

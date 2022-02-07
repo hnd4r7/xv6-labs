@@ -434,6 +434,30 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
   }
 }
 
-void vmprint(pagetable_t p){
+void vmprint_child(pagetable_t pagetable, int level){
+  if (level > 3)
+  {
+    return; // 最后一级是物理地址
+  }
+  for(int i = 0; i < 512; i++){
+    pte_t pte = pagetable[i];
+    // this PTE points to a lower-level page table.
+    if(pte & PTE_V){ // 只有valid的pte才可获取下一级地址
+      uint64 child = PTE2PA(pte);
 
+      printf("%s", "..");
+      for (int j = 1; j<level; j++){
+        printf("%s", " ..");
+      }
+      printf("%d: pte %p pa %p\n", i, pte, child);
+
+      vmprint_child((pagetable_t)child, level + 1);
+    }
+  }
+}
+
+void vmprint(pagetable_t pagetable){
+  // there are 2^9 = 512 PTEs in a page table.
+  printf("page table %p \n", pagetable);
+  vmprint_child(pagetable, 1);
 } 
